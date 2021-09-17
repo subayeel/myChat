@@ -64,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
               title: 'Login',
               onPressed: () {
                 Navigator.pushNamed(context, RegistrationScreen.id);
+                print('success');
               },
               color: Colors.blueGrey),
         ],
