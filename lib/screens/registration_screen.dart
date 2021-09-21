@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mychat/components/round_button.dart';
 import 'package:mychat/constants.dart';
 
+import 'chat_screen.dart';
+
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
 
@@ -15,7 +17,11 @@ class RegistrationScreen extends StatefulWidget {
 class _RegistrationScreenState extends State<RegistrationScreen> {
   String email = '';
   String password = '';
-  FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +46,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             decoration: kTextFieldDecoration.copyWith(
               hintText: 'Enter your Email',
             ),
+            controller: emailController,
           ),
           SizedBox(
             height: 32,
           ),
           TextField(
+            controller: passwordController,
             textAlign: TextAlign.center,
             keyboardType: TextInputType.emailAddress,
             obscureText: true,
@@ -62,20 +70,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               title: 'Register',
               onPressed: () async {
                 try {
-                  UserCredential userCredential = await FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
-                          email: "barry.allen@example.com",
-                          password: "SuperSecretPassword!");
-                } on FirebaseAuthException catch (e) {
-                  if (e.code == 'weak-password') {
-                    print('The password provided is too weak.');
-                  } else if (e.code == 'email-already-in-use') {
-                    print('The account already exists for that email.');
+                  final newUser = await _auth.createUserWithEmailAndPassword(
+                      email: email, password: password);
+                  if (newUser != null) {
+                    Navigator.pushNamed(context, ChatScreen.id);
                   }
                 } catch (e) {
                   print(e);
                 }
-                print(email);
               },
               color: Colors.blueGrey),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mychat/components/round_button.dart';
-import 'package:mychat/screens/registration_screen.dart';
+import 'package:mychat/services/authentication_service.dart';
+import 'package:provider/src/provider.dart';
 
 import '../constants.dart';
 
@@ -15,6 +16,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String email = '';
   String password = '';
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
             height: 12,
           ),
           TextField(
+            controller: emailController,
             textAlign: TextAlign.center,
             keyboardType: TextInputType.emailAddress,
             onChanged: (value) {
@@ -47,11 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
             height: 32,
           ),
           TextField(
+            controller: passwordController,
             textAlign: TextAlign.center,
             keyboardType: TextInputType.emailAddress,
             obscureText: true,
             onChanged: (value) {
-              email = value;
+              password = value;
             },
             decoration: kTextFieldDecoration.copyWith(
               hintText: 'Enter your Password',
@@ -63,10 +68,11 @@ class _LoginScreenState extends State<LoginScreen> {
           RoundButton(
               title: 'Login',
               onPressed: () {
-                Navigator.pushNamed(context, RegistrationScreen.id);
-                print('success');
+                context.read<AuthService>().signIn(
+                    email: emailController.text.trim(),
+                    password: passwordController.text.trim());
               },
-              color: Colors.blueGrey),
+              color: Colors.blue),
         ],
       ),
     );

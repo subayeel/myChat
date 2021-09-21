@@ -6,6 +6,7 @@ import 'package:mychat/screens/registration_screen.dart';
 import 'login_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({Key? key}) : super(key: key);
   static const String id = 'welcome_screen';
 
   @override
