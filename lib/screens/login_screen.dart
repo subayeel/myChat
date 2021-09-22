@@ -67,10 +67,11 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           RoundButton(
               title: 'Login',
-              onPressed: () {
-                context.read<AuthService>().signIn(
+              onPressed: () async {
+                await context.read<AuthService>().signIn(
                     email: emailController.text.trim(),
                     password: passwordController.text.trim());
+                Navigator.pop(context);
               },
               color: Colors.blue),
         ],
