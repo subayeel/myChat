@@ -96,7 +96,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         _firestore.collection('messages').add({
                           'user': loggedInUser?.email,
                           'message': messageText,
-                          'time': FieldValue.serverTimestamp()
+                          'date': DateTime.now().toIso8601String().toString(),
                         });
                       },
                       child: Padding(
@@ -124,10 +124,7 @@ class MessageStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-        stream: _firestore
-            .collection('messages')
-            .orderBy('time', descending: false)
-            .snapshots(),
+        stream: _firestore.collection('messages').orderBy('date').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
@@ -141,14 +138,13 @@ class MessageStream extends StatelessWidget {
           for (var message in messages!) {
             final messageText = (message.data() as Map)['message'];
             final messageSender = (message.data() as Map)['user'];
-            final messageTime = (message.data as Map)['time'] as Timestamp;
             final currentUser = loggedInUser?.email;
 
             final messageBubble = MessageBubble(
-                user: messageSender,
-                text: messageText,
-                isMe: currentUser == messageSender,
-                time: messageTime);
+              user: messageSender,
+              text: messageText,
+              isMe: currentUser == messageSender,
+            );
             messageBubbles.add(messageBubble);
           }
           return Expanded(
@@ -163,15 +159,10 @@ class MessageStream extends StatelessWidget {
 }
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble(
-      {required this.text,
-      required this.user,
-      required this.isMe,
-      required this.time});
+  MessageBubble({required this.text, required this.user, required this.isMe});
   final String? text;
   final String? user;
   final bool? isMe;
-  final Timestamp time;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +175,7 @@ class MessageBubble extends StatelessWidget {
           Padding(
             padding: EdgeInsets.fromLTRB(8, 0, 0, 4),
             child: Text(
-              '$user ${DateTime.fromMicrosecondsSinceEpoch(time.seconds * 1000)}',
+              '$user',
               style: TextStyle(color: Colors.black54, fontSize: 10),
             ),
           ),
