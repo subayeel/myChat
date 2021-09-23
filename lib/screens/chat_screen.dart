@@ -7,6 +7,7 @@ import 'package:provider/src/provider.dart';
 import '../constants.dart';
 
 final _firestore = FirebaseFirestore.instance;
+User? loggedInUser;
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -22,7 +23,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
 
   String messageText = '';
-  User? loggedInUser;
 
   @override
   void initState() {
@@ -136,10 +136,12 @@ class MessageStream extends StatelessWidget {
           for (var message in messages!) {
             final messageText = (message.data() as Map)['message'];
             final messageSender = (message.data() as Map)['user'];
+            final currentUser = loggedInUser?.email;
 
             final messageBubble = MessageBubble(
               user: messageSender,
               text: messageText,
+              isMe: currentUser == messageSender,
             );
             messageBubbles.add(messageBubble);
           }
@@ -154,9 +156,10 @@ class MessageStream extends StatelessWidget {
 }
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble({required this.text, required this.user});
+  MessageBubble({required this.text, required this.user, required this.isMe});
   final String? text;
   final String? user;
+  final bool? isMe;
 
   @override
   Widget build(BuildContext context) {
@@ -173,14 +176,18 @@ class MessageBubble extends StatelessWidget {
             ),
           ),
           Material(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.lightBlueAccent,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(0),
+                topRight: Radius.circular(20),
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20)),
+            color: isMe! ? Colors.lightBlueAccent : Colors.white,
             child: Padding(
               padding: EdgeInsets.all(10.0),
               child: Text(
                 '$text',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: isMe! ? Colors.white : Colors.black54,
                   fontSize: 18,
                 ),
               ),
