@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mychat/services/authentication_service.dart';
+import 'package:provider/src/provider.dart';
 
 import '../constants.dart';
 
@@ -62,7 +64,7 @@ class _ChatScreenState extends State<ChatScreen> {
               icon: Icon(Icons.close),
               onPressed: () {
                 messagesStream();
-                // context.read<AuthService>().signOut();
+                context.read<AuthService>().signOut();
               }),
         ],
         title: Text('⚡️Chat'),
@@ -73,6 +75,26 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            StreamBuilder<QuerySnapshot>(
+                stream: _firestore.collection('messages').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final messages = snapshot.data?.docs;
+                    List<Text> messageWidgets = [];
+                    for (var message in messages!) {
+                      final messageText = (message.data() as Map)['message'];
+                      final messageSender = (message.data() as Map)['user'];
+
+                      final messageWidget =
+                          Text('$messageText from $messageSender');
+                      messageWidgets.add(messageWidget);
+                    }
+                    return Column(
+                      children: messageWidgets,
+                    );
+                  }
+                  return Text('You have no messages');
+                }),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -92,6 +114,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         'user': loggedInUser?.email,
                         'message': messageText
                       });
+                      messageText = '';
                     },
                     child: Text(
                       'Send',
